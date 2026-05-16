@@ -80,10 +80,10 @@ for run_idx = 1:size(runs, 1)
     switch scenario
         case 1
             params.T_amb = 20; params.T_wb = 15; params.humidity = 0.80;
-            params.altitude = 1800; params.t_end = 1000;
+            params.altitude = 1800; params.t_end = 86400;
             params.air_density_ratio = (1 - 0.0000226 * params.altitude)^5.256;
             params.absorption_enabled = false;
-            params.track_xenon = false;
+            params.track_xenon = true;
             params.pcm_storage_enabled = false;
             params.tiac_enabled = false;  % TIAC not needed in temperate
             params.T_condenser_initial = 35;
@@ -119,9 +119,9 @@ for run_idx = 1:size(runs, 1)
     end
 
     if scenario == 3
-        options = odeset('RelTol', 1e-3, 'AbsTol', 1e-5, 'MaxStep', 5.0, 'Stats', 'off');
+        options = odeset('RelTol', 1e-4, 'AbsTol', 1e-6, 'MaxStep', 2.0, 'Stats', 'off');
     else
-        options = odeset('RelTol', 1e-5, 'AbsTol', 1e-7, 'MaxStep', 10);
+        options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8, 'MaxStep', 1.0);
     end
 
     tspan = [0 params.t_end];
@@ -430,6 +430,10 @@ if length(all_results) > 0
     end
     sgtitle('MAD SMR - All Scenarios (Optimized v4.1 with TIAC)');
 end
+
+% Save results for comparison and plotting
+save('results_MAD.mat', 'all_results', '-v7.3');
+fprintf('\nResults saved to results_MAD.mat\n');
 
 fprintf('\n=============================================================\n');
 fprintf('SIMULATION COMPLETE\n');

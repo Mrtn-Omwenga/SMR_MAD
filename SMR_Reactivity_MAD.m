@@ -1,88 +1,107 @@
-function [rho_ext, rho_xenon] = SMR_Reactivity_MAD(t, y, params, scenario)
-% SMR_Reactivity_MAD.m - OPTIMIZED VERSION v4.1
-% Enhanced PID control for load-following with better tracking
+function [rho_ext, rho_xenon, rod_data] = SMR_Reactivity_MAD(t, y, params, scenario)
+% SMR_Reactivity_MAD.m - CRDM + T-avg Program (aligned with base model v11)
+%
+% CRITICAL: Stateless design for ode15s compatibility. No persistent variables.
+% The MAD-specific innovations are in the cooling system (SMR_ODEs_MAD), not
+% the controller. Using the same controller architecture ensures fair
+% comparison between baseline and MAD.
+%
+% Reference: Byun & Yim (2024), SMART-100 load-following analysis
 
-% Initialize outputs
+%% Initialize outputs
 rho_ext = 0;
 rho_xenon = 0;
+rod_data = struct('position', 0, 'worth', 0, 'demand_reactivity', 0, ...
+                  'T_avg', 0, 'T_avg_error', 0);
 
-% Unpack states
-P_top = y(1);
-P_bottom = y(2);
+%% Unpack states
+P_norm = (y(1) + y(2)) / 2.0;
 T_f = y(17);
 T_c = y(18);
-P_total = P_top + P_bottom;
 
+%% ========================================================================
+% SCENARIO C: LOAD-FOLLOWING WITH CRDM + T-AVG PROGRAM
+%% ========================================================================
 if scenario == 3
-    % ========== SCENARIO C: LOAD-FOLLOWING WITH OPTIMIZED PID ==========
-
-    % Get demand
+    % Get demand profile
     P_demand = 0.8;
     try
         P_demand = SMR_Demand(t, params, scenario);
-    catch
-        % Keep fallback
+    catch ME
+        fprintf('  [WARN] SMR_Demand error at t=%.3f: %s\n', t, ME.message);
+        P_demand = 0.8;
     end
 
-    P_norm = P_total / 2.0;
-    error_signal = P_demand - P_norm;
+    % --- POWER TRACKING ERROR ---
+    power_error = P_demand - P_norm;
 
-    % ========== GAIN-SCHEDULED PID - OPTIMIZED ==========
-    if params.gain_scheduling_enabled
-        power_frac = P_norm;
-        if power_frac < 0.6
-            Kp = 0.0015;   Ki = 0.00008;  Kd = 0.000015;
-        elseif power_frac < 0.9
-            Kp = 0.0025;   Ki = 0.00012;  Kd = 0.000025;
-        else
-            Kp = 0.0035;   Ki = 0.00015;  Kd = 0.000035;
-        end
+    % --- T-AVG PROGRAM ---
+    T_avg_slope = 30.0;
+    T_avg_ref = params.T_avg_nominal - T_avg_slope * max(0, 1.0 - P_demand);
+    T_avg_error = T_avg_ref - T_c;
+
+    % --- FEEDFORWARD REACTIVITY ---
+    if P_demand < 0.85
+        rho_ff = -0.002;
     else
-        Kp = 0.0025;
-        Ki = 0.00008;
-        Kd = 0.00002;
+        rho_ff = 0.0;
     end
 
-    % Proportional term
-    rho_p = Kp * error_signal;
+    % --- PROPORTIONAL CONTROL ---
+    Kp = 0.020;
+    rho_p = Kp * power_error;
 
-    % Integral term (stateless with anti-windup)
-    tau_i = 1500;  % Reduced from 2000 for faster response
-    rho_i = Ki * error_signal * min(t, tau_i);
-    rho_i = max(min(rho_i, 0.006), -0.006);
+    % --- STATELESS INTEGRAL ---
+    Ki = 0.00002;
+    tau_i = 5000;
+    rho_i = Ki * power_error * min(t, tau_i);
+    rho_i = max(min(rho_i, 0.008), -0.008);
 
-    % Derivative term on demand rate (feedforward)
-    dP_demand_dt = 0;
-    try
-        dP_demand_dt = SMR_DemandRate(t, params);
-    catch
-        % Keep zero
+    % --- TOTAL CRDM DEMAND ---
+    rho_demand = rho_ff + rho_p + rho_i;
+
+    % Clamp to physical rod worth (sin-squared curve peak = 0.015)
+    rho_max = 0.015;
+    rho_demand = max(min(rho_demand, rho_max), -rho_max);
+
+    % --- ALGEBRAIC ROD POSITION (diagnostics only) ---
+    if abs(rho_demand) > 1e-10
+        rod_z = -sign(rho_demand) * (2/pi) * asin(sqrt(abs(rho_demand) / rho_max));
+    else
+        rod_z = 0.0;
     end
-    rho_d = Kd * dP_demand_dt;
 
-    % Total external reactivity
-    rho_ext = rho_p + rho_i + rho_d;
+    % Rod reactivity from position (inverse mapping gives rho_ext = rho_demand)
+    rho_mag = rho_max * sin(pi * abs(rod_z) / 2)^2;
+    rho_ext = -sign(rod_z) * rho_mag;
 
-    % ========== RATE LIMITING ==========
-    rho_ext = max(min(rho_ext, 0.008), -0.008);
+    % --- DIAGNOSTICS STRUCT ---
+    rod_data.position = rod_z;
+    rod_data.worth = rho_ext;
+    rod_data.demand_reactivity = rho_demand;
+    rod_data.T_avg = T_c;
+    rod_data.T_avg_error = T_avg_error;
 
+    % --- LOGGING (stateless) ---
+    if abs(power_error) > 0.03
+        rho_fb = params.alpha_f * (T_f - params.T_f0_nominal) + ...
+                 params.alpha_c * (T_c - params.T_c0_nominal);
+        fprintf('  [LOG t=%8.1f] P=%.3f, P_dem=%.3f, P_err=%+.3f | ', ...
+                t, P_norm, P_demand, power_error);
+        fprintf('T_c=%6.1f, T_ref=%6.1f, T_err=%+6.1f | ', ...
+                T_c, T_avg_ref, T_avg_error);
+        fprintf('rod_z=%+.3f, rho_ext=%+.5f, rho_fb=%+.5f\n', ...
+                rod_z, rho_ext, rho_fb);
+    end
+
+%% ========================================================================
+% SCENARIOS A & B: STEADY-STATE BASELINE
+%% ========================================================================
 else
-    % ========== SCENARIOS A & B: Simple ramp profile ==========
-    if t < params.demand_ramp_up_start
-        rho_ext = 0;
-    elseif t < params.demand_ramp_up_end
-        fraction = (t - params.demand_ramp_up_start) / ...
-                   (params.demand_ramp_up_end - params.demand_ramp_up_start);
-        rho_ext = params.demand_magnitude * fraction;
-    elseif t < params.demand_hold_end
-        rho_ext = params.demand_magnitude;
-    elseif t < params.demand_ramp_down_end
-        fraction = 1 - (t - params.demand_hold_end) / ...
-                   (params.demand_ramp_down_end - params.demand_hold_end);
-        rho_ext = params.demand_magnitude * fraction;
-    else
-        rho_ext = 0;
-    end
+    % Scenario A (temperate baseline) and Scenario B (hot/arid dry cooling)
+    % both operate at steady-state with no external reactivity transient.
+    % Temperature feedback alone maintains power at the nominal level.
+    rho_ext = 0;
 end
 
 end

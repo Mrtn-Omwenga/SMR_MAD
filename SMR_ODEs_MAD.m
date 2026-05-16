@@ -312,6 +312,7 @@ try
 
     % ========== REACTIVITY ==========
     [rho_ext, rho_xenon] = SMR_Reactivity_MAD(t, y, params, scenario);
+    rho_ext = max(min(rho_ext, 0.015), -0.015);
 
     % Temperature feedback
     rho_fb = params.alpha_f * (T_f - params.T_f0_nominal) + ...
@@ -322,7 +323,7 @@ try
     if params.track_xenon
         denom = params.lambda_X + params.sigma_X * phi;
         denom = max(denom, 1e-10);
-        X_eq = (params.gamma_X * params.Sigma_f * phi) / denom;
+        X_eq = ((params.gamma_X + params.gamma_I) * params.Sigma_f * phi) / denom;
         X_eq = max(min(X_eq, 1e17), 1e10);
         X_diff = X_conc - X_eq;
         X_diff = max(min(X_diff, 1e16), -1e16);

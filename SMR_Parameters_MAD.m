@@ -1,4 +1,4 @@
-function params = SMR_Parameters_MAD_v4_1()
+function params = SMR_Parameters_MAD()
 % SMR_Parameters_MAD_v4_1.m - AGGRESSIVE OPTIMIZATION
 % Pushing boundaries to achieve >70 MWe (B) and >50 MWe (C)
 % 

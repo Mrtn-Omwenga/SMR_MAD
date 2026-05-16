@@ -46,7 +46,7 @@ rho_xenon = 0;
 if params.track_xenon
     denom = lambda_X_safe + sigma_X_safe * phi;
     denom = max(denom, 1e-10);
-    X_eq = (gamma_X_safe * Sigma_f_safe * phi) / denom;
+    X_eq = ((gamma_X_safe + gamma_I_safe) * Sigma_f_safe * phi) / denom;
     X_eq = max(min(X_eq, 1e17), 1e10);
 
     X_diff = X_conc - X_eq;
@@ -66,7 +66,7 @@ rho_fb = max(min(rho_fb, 0.002), -0.005);
 
 % ========== EXTERNAL REACTIVITY ==========
 rho_ext = SMR_Reactivity(t, y, params, scenario);
-rho_ext = max(min(rho_ext, 0.002), -0.002);
+rho_ext = max(min(rho_ext, 0.015), -0.015);
 
 % ========== TOTAL REACTIVITY ==========
 rho_total = rho_ext + rho_fb + rho_xenon;

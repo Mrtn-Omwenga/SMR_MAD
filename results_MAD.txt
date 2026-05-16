@@ -7,19 +7,19 @@ MINIMALLY ADAPTABLE DESIGN (MAD) SIMULATION SUITE - OPTIMIZED v4.1
 MAD RUN 1: Scenario A - Once-through
 -------------------------------------------------------------
   Starting solver...
-  Completed: 181 steps in 0.05s
+  Completed: 86444 steps in 3.85s
 
 --- RESULTS ---
   Power: 100.0% (249.9 MWt)
   Power range: 1.999 to 2.001
   T_cond: 24.9C, T_fuel: 600.0C
-  T_fuel range: 600.0 to 600.2C
+  T_fuel range: 600.0 to 600.0C
   Turbine factor: 1.000
   Overshoot: 0.1%
   Gross: 77.0 MWe
   Net: 77.0 MWe
   Power stable
-  Temperature safe (peak 600.2 < 800C)
+  Temperature safe (peak 600.0 < 800C)
   Overshoot acceptable (0.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
@@ -28,19 +28,19 @@ MAD RUN 1: Scenario A - Once-through
 MAD RUN 2: Scenario A - Wet Cooling Tower
 -------------------------------------------------------------
   Starting solver...
-  Completed: 166 steps in 0.01s
+  Completed: 86444 steps in 6.80s
 
 --- RESULTS ---
   Power: 100.0% (249.9 MWt)
   Power range: 1.999 to 2.001
   T_cond: 27.0C, T_fuel: 600.0C
-  T_fuel range: 600.0 to 600.2C
+  T_fuel range: 600.0 to 600.0C
   Turbine factor: 1.000
   Overshoot: 0.1%
   Gross: 77.0 MWe
   Net: 77.0 MWe
   Power stable
-  Temperature safe (peak 600.2 < 800C)
+  Temperature safe (peak 600.0 < 800C)
   Overshoot acceptable (0.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
@@ -49,19 +49,19 @@ MAD RUN 2: Scenario A - Wet Cooling Tower
 MAD RUN 3: Scenario B - Dry Air-Cooled (MAD v4.1)
 -------------------------------------------------------------
   Starting solver...
-  Completed: 258 steps in 0.04s
+  Completed: 2041 steps in 0.18s
 
 --- RESULTS ---
   Power: 100.0% (249.9 MWt)
   Power range: 1.999 to 2.001
   T_cond: 46.7C, T_fuel: 600.0C
-  T_fuel range: 600.0 to 600.2C
+  T_fuel range: 600.0 to 600.0C
   Turbine factor: 0.993
   Overshoot: 0.1%
   Gross: 76.5 MWe, Fan: 6.5 MW, TIAC: 1.5 MW
   Net: 68.5 MWe
   Power stable
-  Temperature safe (peak 600.2 < 800C)
+  Temperature safe (peak 600.0 < 800C)
   Overshoot acceptable (0.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
@@ -70,21 +70,21 @@ MAD RUN 3: Scenario B - Dry Air-Cooled (MAD v4.1)
 MAD RUN 4: Scenario C - Once-through
 -------------------------------------------------------------
   Starting solver...
-  Completed: 17423 steps in 1.10s
-  Tracking: max overshoot 0.0%, max undershoot 57.3%
+  Completed: 43379 steps in 2.84s
+  Tracking: max overshoot 3.1%, max undershoot 14.5%
 
 --- RESULTS ---
-  Power: 78.4% (195.9 MWt)
-  Power range: 0.684 to 1.962
-  T_cond: 23.9C, T_fuel: 542.4C
-  T_fuel range: 425.1 to 600.0C
+  Power: 80.0% (199.9 MWt)
+  Power range: 1.217 to 2.012
+  T_cond: 24.0C, T_fuel: 546.7C
+  T_fuel range: 495.6 to 601.8C
   Turbine factor: 1.000
-  Overshoot: 0.0%
-  Gross: 60.3 MWe
-  Net: 60.3 MWe
-  Tracking OK (error 1.6%)
-  Temperature safe (peak 600.0 < 800C)
-  Overshoot acceptable (0.0% < 20%)
+  Overshoot: 3.1%
+  Gross: 61.6 MWe
+  Net: 61.6 MWe
+  Tracking OK (error 0.0%)
+  Temperature safe (peak 601.8 < 800C)
+  Overshoot acceptable (3.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
 
@@ -92,21 +92,21 @@ MAD RUN 4: Scenario C - Once-through
 MAD RUN 5: Scenario C - Wet Cooling Tower
 -------------------------------------------------------------
   Starting solver...
-  Completed: 17428 steps in 1.03s
-  Tracking: max overshoot 0.0%, max undershoot 57.3%
+  Completed: 43384 steps in 2.77s
+  Tracking: max overshoot 3.1%, max undershoot 14.5%
 
 --- RESULTS ---
-  Power: 78.4% (195.9 MWt)
-  Power range: 0.684 to 1.962
-  T_cond: 36.0C, T_fuel: 542.4C
-  T_fuel range: 425.1 to 600.0C
+  Power: 80.0% (199.9 MWt)
+  Power range: 1.217 to 2.012
+  T_cond: 36.0C, T_fuel: 546.7C
+  T_fuel range: 495.6 to 601.8C
   Turbine factor: 1.000
-  Overshoot: 0.0%
-  Gross: 60.3 MWe
-  Net: 60.3 MWe
-  Tracking OK (error 1.6%)
-  Temperature safe (peak 600.0 < 800C)
-  Overshoot acceptable (0.0% < 20%)
+  Overshoot: 3.1%
+  Gross: 61.6 MWe
+  Net: 61.6 MWe
+  Tracking OK (error 0.0%)
+  Temperature safe (peak 601.8 < 800C)
+  Overshoot acceptable (3.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
 
@@ -114,21 +114,21 @@ MAD RUN 5: Scenario C - Wet Cooling Tower
 MAD RUN 6: Scenario C - Dry Air-Cooled (MAD v4.1)
 -------------------------------------------------------------
   Starting solver...
-  Completed: 17423 steps in 1.14s
-  Tracking: max overshoot 0.0%, max undershoot 57.3%
+  Completed: 43384 steps in 3.09s
+  Tracking: max overshoot 3.1%, max undershoot 14.5%
 
 --- RESULTS ---
-  Power: 78.4% (195.9 MWt)
-  Power range: 0.684 to 1.962
-  T_cond: 43.0C, T_fuel: 542.4C
-  T_fuel range: 425.1 to 600.0C
-  Turbine factor: 1.000
-  Overshoot: 0.0%
-  Gross: 60.3 MWe, Fan: 5.1 MW, TIAC: 0.0 MW
-  Net: 55.2 MWe
-  Tracking OK (error 1.6%)
-  Temperature safe (peak 600.0 < 800C)
-  Overshoot acceptable (0.0% < 20%)
+  Power: 80.0% (199.9 MWt)
+  Power range: 1.217 to 2.012
+  T_cond: 51.2C, T_fuel: 546.7C
+  T_fuel range: 495.6 to 601.8C
+  Turbine factor: 0.960
+  Overshoot: 3.1%
+  Gross: 59.1 MWe, Fan: 5.5 MW, TIAC: 0.0 MW
+  Net: 53.6 MWe
+  Tracking OK (error 0.0%)
+  Temperature safe (peak 601.8 < 800C)
+  Overshoot acceptable (3.1% < 20%)
   Axial offset identically zero
   Verdict: PASS (4/4)
 
@@ -141,9 +141,9 @@ Scenario | Cooling Mode              | Thermal | Gross  | Net    | Cond | Fan  |
     A    | Once-through             |  100.0%   |   77.0 |   77.0 |   25C |  0.0 |  0.0 |  1.000  |     0.1%  | PASS
     A    | Wet Cooling Tower        |  100.0%   |   77.0 |   77.0 |   27C |  0.0 |  0.0 |  1.000  |     0.1%  | PASS
     B    | Dry Air-Cooled (MAD v4.1) |  100.0%   |   76.5 |   68.5 |   47C |  6.5 |  1.5 |  0.993  |     0.1%  | PASS
-    C    | Once-through             |   78.4%   |   60.3 |   60.3 |   24C |  0.0 |  0.0 |  1.000  |     0.0%  | PASS
-    C    | Wet Cooling Tower        |   78.4%   |   60.3 |   60.3 |   36C |  0.0 |  0.0 |  1.000  |     0.0%  | PASS
-    C    | Dry Air-Cooled (MAD v4.1) |   78.4%   |   60.3 |   55.2 |   43C |  5.1 |  0.0 |  1.000  |     0.0%  | PASS
+    C    | Once-through             |   80.0%   |   61.6 |   61.6 |   24C |  0.0 |  0.0 |  1.000  |     3.1%  | PASS
+    C    | Wet Cooling Tower        |   80.0%   |   61.6 |   61.6 |   36C |  0.0 |  0.0 |  1.000  |     3.1%  | PASS
+    C    | Dry Air-Cooled (MAD v4.1) |   80.0%   |   59.1 |   53.6 |   51C |  5.5 |  0.0 |  0.960  |     3.1%  | PASS
 =====================================================================
 
 =============================================================

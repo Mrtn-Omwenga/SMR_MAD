@@ -89,7 +89,7 @@ for run_idx = 1:size(runs, 1)
     switch scenario
         case 1
             params.T_amb = 20; params.T_wb = 15; params.altitude = 1800;
-            params.t_end = 1000; params.track_xenon = false;
+            params.t_end = 86400; params.track_xenon = true;
             params.air_density_ratio = (1 - 0.0000226 * params.altitude)^5.256;
             params.m_dot_cw = 500; params.T_cw_in = 15;
             params.T_condenser_initial = 35;
@@ -100,7 +100,7 @@ for run_idx = 1:size(runs, 1)
             params.eta_cool = 0.70; params.T_condenser_initial = 55;
         case 3
             params.T_amb = 28; params.T_wb = 24; params.altitude = 50;
-            params.t_end = 1000; params.track_xenon = false;
+            params.t_end = 86400; params.track_xenon = true;
             params.air_density_ratio = (1 - 0.0000226 * params.altitude)^5.256;
             params.m_dot_cw = 500; params.T_cw_in = 28;
             params.T_condenser_initial = 35;
@@ -136,8 +136,10 @@ for run_idx = 1:size(runs, 1)
     denominator = params.lambda_X + params.sigma_X * phi_initial;
     X0 = numerator / denominator;
 
-    T_f0 = params.T_f0_nominal + 300 * (P0_steady - 1.0);
-    T_c0 = params.T_c0_nominal + 50 * (P0_steady - 1.0);
+    % Use nominal temperatures for all initial conditions (consistent with MAD).
+    % The CRDM pre-initialization balances any initial feedback.
+    T_f0 = params.T_f0_nominal;
+    T_c0 = params.T_c0_nominal;
     T_condenser0 = params.T_condenser_initial;
 
     y0 = [P0_steady; P0_steady; C0; C0; I0; X0; T_f0; T_c0; T_condenser0];
@@ -246,7 +248,17 @@ for run_idx = 1:size(runs, 1)
     all_results(run_idx).net_MWe = net_MWe;
     all_results(run_idx).fan_power_MW = fan_power_MW;
     all_results(run_idx).verdict = verdict;
+    % Save time-series data for figure generation
+    all_results(run_idx).t = t;
+    all_results(run_idx).P_total = P_total;
+    all_results(run_idx).T_cond = T_condenser_final;
+    all_results(run_idx).P_demand = P_demand;
+    all_results(run_idx).T_fuel = T_fuel;
 end
+
+% Save results for comparison and plotting
+save('results_baseline.mat', 'all_results', '-v7.3');
+fprintf('\nResults saved to results_baseline.mat\n');
 
 fprintf('\n\n');
 fprintf('=====================================================================\n');
