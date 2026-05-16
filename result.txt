@@ -1,0 +1,67 @@
+
+=============================================================
+SMR SIMULATION SUITE - FIXED v7 (Load-Following Corrected)
+=============================================================
+
+-------------------------------------------------------------
+RUN 1: Scenario A - Once-through
+-------------------------------------------------------------
+  Solver completed in 0.07 seconds: 1087 time steps
+
+  Verdict: PASS (4/4 criteria)
+
+-------------------------------------------------------------
+RUN 2: Scenario A - Wet Cooling Tower
+-------------------------------------------------------------
+  Solver completed in 0.04 seconds: 1087 time steps
+
+  Verdict: PASS (4/4 criteria)
+
+-------------------------------------------------------------
+RUN 3: Scenario B - Dry Air-Cooled
+-------------------------------------------------------------
+  Solver completed in 0.05 seconds: 2080 time steps
+
+  Verdict: PASS (4/4 criteria)
+
+-------------------------------------------------------------
+RUN 4: Scenario C - Once-through
+-------------------------------------------------------------
+  Starting at demand level: 0.80
+  Solver completed in 0.04 seconds: 514 time steps
+  Load-following acceptable (error 2.0%)
+
+  Verdict: PASS (4/4 criteria)
+
+-------------------------------------------------------------
+RUN 5: Scenario C - Wet Cooling Tower
+-------------------------------------------------------------
+  Starting at demand level: 0.80
+  Solver completed in 0.04 seconds: 514 time steps
+  Load-following acceptable (error 2.0%)
+
+  Verdict: PASS (4/4 criteria)
+
+-------------------------------------------------------------
+RUN 6: Scenario C - Dry Air-Cooled
+-------------------------------------------------------------
+  Starting at demand level: 0.80
+  Solver completed in 0.03 seconds: 514 time steps
+  Load-following acceptable (error 2.0%)
+
+  Verdict: PASS (4/4 criteria)
+
+
+=====================================================================
+                    SMR PERFORMANCE SUMMARY - FIXED v7
+=====================================================================
+Scenario | Cooling Mode        | Thermal | Net    | Fan   | Turbine | Cond | Verdict
+---------------------------------------------------------------------
+    A    | Once-through        | 249.9MWt |  77.0MWe |  0.0MW |  1.000  |  30C | PASS
+    A    | Wet Cooling Tower   | 249.9MWt |  77.0MWe |  0.0MW |  1.000  |  27C | PASS
+    B    | Dry Air-Cooled      | 249.9MWt |  51.1MWe |  8.0MW |  0.767  |  71C | PASS
+    C    | Once-through        | 204.9MWt |  63.1MWe |  0.0MW |  1.000  |  43C | PASS
+    C    | Wet Cooling Tower   | 204.9MWt |  63.1MWe |  0.0MW |  1.000  |  36C | PASS
+    C    | Dry Air-Cooled      | 204.9MWt |  52.3MWe |  7.9MW |  0.954  |  51C | PASS
+=====================================================================
+>> 
