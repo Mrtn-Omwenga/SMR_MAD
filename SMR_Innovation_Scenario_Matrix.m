@@ -256,8 +256,6 @@ fprintf('\nPlot saved: fig_innovation_scenario_matrix.png\n');
 save('innovation_matrix_results.mat', 'net_MWe', 'T_cond', 'turbine_factor', 'scenarios', 'cases');
 fprintf('Results saved: innovation_matrix_results.mat\n');
 
-end
-
 function tf = calc_tf(T_cond)
     if T_cond <= 100
         log10_P = 8.07131 - 1730.63 / (233.426 + T_cond);
