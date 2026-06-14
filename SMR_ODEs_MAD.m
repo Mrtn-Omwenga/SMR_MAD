@@ -35,6 +35,7 @@ try
     T_c = y(18);
     T_condenser = y(19);
     T_pcm = y(20);
+    pcm_melted_fraction = y(21);
 
     P_total = P_top + P_bottom;
     P_total = max(P_total, 0.01);  % Prevent division by zero only
@@ -97,6 +98,7 @@ try
     fan_power_MW = 0;
     Q_cooling_capacity_W = 0;
     dT_pcm_dt = 0;
+    d_pcm_melted_fraction_dt = 0;
     rho_condenser_feedback = 0;
     dT_condenser_dt = 0;
     tiac_power_MW = 0;  % NEW: TIAC parasitic load
@@ -178,16 +180,23 @@ try
             Q_steam_W_check = min(Q_steam_W_check, P_actual_W);
             desiccant_power = params.desiccant_heat_fraction * Q_steam_W_check;
 
+            % Humidity-dependent desiccant effectiveness:
+            % More moisture to remove in humid air (small wet-bulb depression),
+            % less benefit in dry air (large wet-bulb depression).
+            T_wb = params.T_wb;
+            wb_depression = ambient_temp - T_wb;
+            humidity_factor = max(0.3, min(1.0, 1.0 - (wb_depression - 5)/25));
+
             if params.desiccant_two_stage
-                % Two-stage desiccant with AGGRESSIVE boost
+                % Two-stage desiccant with humidity-aware boost
                 if desiccant_power > 15e6
-                    desiccant_benefit = params.desiccant_stage1_boost + params.desiccant_stage2_boost;
+                    desiccant_benefit = (params.desiccant_stage1_boost + params.desiccant_stage2_boost) * humidity_factor;
                 elseif desiccant_power > 8e6
-                    desiccant_benefit = params.desiccant_stage1_boost + params.desiccant_stage2_boost * 0.6;
+                    desiccant_benefit = (params.desiccant_stage1_boost + params.desiccant_stage2_boost * 0.6) * humidity_factor;
                 elseif desiccant_power > 4e6
-                    desiccant_benefit = params.desiccant_stage1_boost;
+                    desiccant_benefit = params.desiccant_stage1_boost * humidity_factor;
                 else
-                    desiccant_benefit = params.desiccant_stage1_boost * 0.3;
+                    desiccant_benefit = params.desiccant_stage1_boost * 0.3 * humidity_factor;
                 end
             end
         end
@@ -275,29 +284,27 @@ try
         end
 
         % Innovation 3: Enhanced PCM thermal storage - ENABLED for all scenarios
+        % State-of-charge is now tracked as ODE state y(21), so it persists
+        % across time steps instead of resetting due to pass-by-value params.
         if params.pcm_storage_enabled
+            pcm_melted_fraction = max(0, min(1, pcm_melted_fraction));  % bound state
             if ambient_temp < params.pcm_charge_temp_threshold
                 % Cool conditions: charge PCM (solidify)
-                params.pcm_melted_fraction = max(0, params.pcm_melted_fraction - 0.001);
+                if pcm_melted_fraction > 0
+                    d_pcm_melted_fraction_dt = -0.001;
+                end
                 dT_pcm_dt = -0.03;
             elseif ambient_temp > params.pcm_discharge_temp_threshold
                 % Hot conditions: discharge PCM (melt) to boost cooling
-                if T_condenser > params.pcm_melt_temp && params.pcm_melted_fraction < 1.0
-                    % PCM provides additional cooling during peak heat
-                    pcm_cooling_boost = 50e6 * power_fraction * (1 - params.pcm_melted_fraction);
+                if T_condenser > params.pcm_melt_temp && pcm_melted_fraction < 1.0
+                    pcm_cooling_boost = 50e6 * power_fraction * (1 - pcm_melted_fraction);
                     Q_cooling_capacity_W = Q_cooling_capacity_W + pcm_cooling_boost;
-                    params.pcm_melted_fraction = min(1, params.pcm_melted_fraction + 0.003);
+                    d_pcm_melted_fraction_dt = 0.003;
                 end
                 dT_pcm_dt = 0.03;
             else
                 dT_pcm_dt = 0;
             end
-            % NOTE: PCM state-of-charge tracking is simplified.
-        % params.pcm_melted_fraction is read at initial value and does not
-        % deplete dynamically between ODE calls (MATLAB pass-by-value).
-        % This gives a constant boost approximation suitable for BSc-level
-        % analysis. For dynamic tracking, pcm_melted_fraction should become
-        % a state variable (state #21).
         end
 
         % Condenser feedback for insufficient cooling (milder)
@@ -414,6 +421,7 @@ try
     dydt(18) = dT_c_dt;
     dydt(19) = dT_condenser_dt;
     dydt(20) = dT_pcm_dt;
+    dydt(21) = d_pcm_melted_fraction_dt;
 
 catch ME
     error_count = error_count + 1;

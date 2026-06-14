@@ -203,7 +203,7 @@ function [net_MWe, T_cond_final, turbine_factor, fan_power, solver_status] = run
     T_f0 = params.T_f0_nominal + 300 * (P0 - 1.0);
     T_c0 = params.T_c0_nominal + 50 * (P0 - 1.0);
     
-    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params.T_condenser_initial; params.pcm_melt_temp];
+    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params.T_condenser_initial; params.pcm_melt_temp; params.pcm_initial_charge];
     
     solver_status = 'OK';
     t = []; y = [];

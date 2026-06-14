@@ -21,6 +21,7 @@ T_f = y(17);
 T_c = y(18);
 T_condenser = y(19);
 T_pcm = y(20);
+pcm_melted_fraction = y(21);
 
 P_total = P_top + P_bottom;
 P_total = max(min(P_total, 2.4), 0.1);
@@ -80,6 +81,7 @@ fan_speed = 0;
 fan_power_MW = 0;
 Q_cooling_capacity_W = 0;
 dT_pcm_dt = 0;
+d_pcm_melted_fraction_dt = 0;
 rho_condenser_feedback = 0;
 dT_condenser_dt = 0;
 
@@ -226,14 +228,17 @@ elseif strcmp(params.cooling_mode, 'dry')
 
     % PCM storage
     if params.pcm_storage_enabled
+        pcm_melted_fraction = max(0, min(1, pcm_melted_fraction));
         if ambient_temp < params.pcm_charge_temp_threshold
-            params.pcm_melted_fraction = max(0, params.pcm_melted_fraction - 0.001);
+            if pcm_melted_fraction > 0
+                d_pcm_melted_fraction_dt = -0.001;
+            end
             dT_pcm_dt = -0.03;
         elseif ambient_temp > params.pcm_discharge_temp_threshold
-            if T_condenser > params.pcm_melt_temp && params.pcm_melted_fraction < 1.0
-                pcm_cooling_boost = 50e6 * power_fraction * (1 - params.pcm_melted_fraction);
+            if T_condenser > params.pcm_melt_temp && pcm_melted_fraction < 1.0
+                pcm_cooling_boost = 50e6 * power_fraction * (1 - pcm_melted_fraction);
                 Q_cooling_capacity_W = Q_cooling_capacity_W + pcm_cooling_boost;
-                params.pcm_melted_fraction = min(1, params.pcm_melted_fraction + 0.003);
+                d_pcm_melted_fraction_dt = 0.003;
             end
             dT_pcm_dt = 0.03;
         else
@@ -354,6 +359,7 @@ dydt(17) = dT_f_dt;
 dydt(18) = dT_c_dt;
 dydt(19) = dT_condenser_dt;
 dydt(20) = dT_pcm_dt;
+dydt(21) = d_pcm_melted_fraction_dt;
 
 end
 

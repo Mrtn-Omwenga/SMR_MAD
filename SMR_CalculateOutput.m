@@ -110,7 +110,10 @@ function [net_MWe, gross_MWe, turbine_factor, fan_power_MW, effectiveness, fan_s
     if isfield(params, 'absorption_enabled') && params.absorption_enabled && ...
        isfield(params, 'desiccant_enabled') && params.desiccant_enabled && ...
        isfield(params, 'desiccant_stage1_boost') && isfield(params, 'desiccant_stage2_boost')
-        des_benefit = params.desiccant_stage1_boost + params.desiccant_stage2_boost;
+        % Humidity-dependent desiccant benefit (matches ODE model)
+        wb_depression = params.T_amb - params.T_wb;
+        humidity_factor = max(0.3, min(1.0, 1.0 - (wb_depression - 5)/25));
+        des_benefit = (params.desiccant_stage1_boost + params.desiccant_stage2_boost) * humidity_factor;
     end
     
     mc_benefit = 0;

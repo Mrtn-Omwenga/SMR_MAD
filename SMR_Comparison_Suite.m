@@ -117,7 +117,7 @@ if RUN_MAD
     T_f0 = params_mad.T_f0_nominal + 300 * (P0 - 1.0);
     T_c0 = params_mad.T_c0_nominal + 50 * (P0 - 1.0);
 
-    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params_mad.T_condenser_initial; params_mad.pcm_melt_temp];
+    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params_mad.T_condenser_initial; params_mad.pcm_melt_temp; params_mad.pcm_initial_charge];
 
     [t, y] = ode15s(@(t,y) SMR_ODEs_MAD(t, y, params_mad, 3), tspan, y0, options);
 
@@ -219,7 +219,7 @@ if RUN_COMPARE
     tspan = [0 params_mad.t_end];
     options_mad = odeset('RelTol', 1e-3, 'AbsTol', 1e-5, 'MaxStep', 5.0, 'Stats', 'off');
 
-    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params_mad.T_condenser_initial; params_mad.pcm_melt_temp];
+    y0 = [P0; P0; C0; C0; I0; X0; T_f0; T_c0; params_mad.T_condenser_initial; params_mad.pcm_melt_temp; params_mad.pcm_initial_charge];
 
     fprintf('  [MAD] Running solver...\n');
     tic;

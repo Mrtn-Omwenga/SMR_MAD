@@ -81,7 +81,7 @@ phi_initial = calc_phi(P0 * 2.0, params);
 I0 = (params.gamma_I * params.Sigma_f * phi_initial) / params.lambda_I;
 X0 = (params.gamma_X * params.Sigma_f * phi_initial + params.lambda_I * I0) / (params.lambda_X + params.sigma_X * phi_initial);
 
-y0 = [P0; P0; C0; C0; I0; X0; params.T_f0_nominal; params.T_c0_nominal; params.T_condenser_initial; params.pcm_melt_temp];
+y0 = [P0; P0; C0; C0; I0; X0; params.T_f0_nominal; params.T_c0_nominal; params.T_condenser_initial; params.pcm_melt_temp; params.pcm_initial_charge];
 
 [t, y] = ode15s(@(t,y) SMR_ODEs_MAD(t, y, params, 1), tspan, y0, options);
 

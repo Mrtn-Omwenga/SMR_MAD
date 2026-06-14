@@ -146,7 +146,7 @@ for run_idx = 1:size(runs, 1)
 
     y0 = [P0_steady; P0_steady; C0; C0; I0; X0; ...
           params.T_f0_nominal; params.T_c0_nominal; ...
-          params.T_condenser_initial; params.pcm_melt_temp];
+          params.T_condenser_initial; params.pcm_melt_temp; params.pcm_initial_charge];
 
     % ========== RUN SOLVER ==========
     try

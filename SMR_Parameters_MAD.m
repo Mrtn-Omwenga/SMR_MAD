@@ -133,7 +133,7 @@ params.pcm_charge_temp_threshold = 24;
 params.pcm_discharge_temp_threshold = 34;
 params.pcm_charge_rate_MW = 40;
 params.pcm_discharge_rate_MW = 70;
-params.pcm_initial_charge = 0.0;
+params.pcm_initial_charge = 1.0;  % Start fully charged so PCM can discharge during peak heat
 
 %% =========================================================================
 % INNOVATION 4: MAISOTSENKO CYCLE (M-Cycle) EVAPORATIVE COOLER
@@ -145,7 +145,7 @@ params.maisotsenko_enabled = true;
 params.m_cycle_effectiveness = 0.80;
 params.m_cycle_pressure_drop = 0.97;
 params.m_cycle_water_consumption_m3_per_day = 100;
-params.m_cycle_activation_temp = 30;
+params.m_cycle_activation_temp = 20;  % Lowered from 30 to benefit moderate/humid scenarios
 
 %% =========================================================================
 % INNOVATION 5: TURBINE INLET AIR COOLING (TIAC)
@@ -156,7 +156,7 @@ params.tiac_effectiveness = 0.70;        % Approach to wet bulb
 params.tiac_temp_reduction_max = 15;     % Max 15°C reduction
 params.tiac_power_consumption_MW = 1.5;  % Parasitic load for chillers/pumps
 params.tiac_waste_heat_fraction = 0.08;  % Fraction of waste heat used
-params.tiac_activation_temp = 30;        % Activate above 30°C ambient
+params.tiac_activation_temp = 20;        % Lowered from 30 to benefit moderate/humid scenarios
 
 %% =========================================================================
 % SITE CONDITIONS
@@ -216,7 +216,7 @@ params.current_condenser_temp = params.T_condenser_initial;
 params.current_derate = 1.0;
 params.pcm_melted_fraction = params.pcm_initial_charge;
 
-params.absorption_enabled = false;
+params.absorption_enabled = true;  % Enable desiccant benefit by default
 
 % Differential rod control (for Scenario C non-dry cooling)
 params.differential_rods_enabled = false;
