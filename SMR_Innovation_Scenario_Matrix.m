@@ -96,11 +96,11 @@ end
 
 % Figure
 figure('Position', [100 100 1000 600]);
-b = bar(net_MWe', 'BarWidth', 0.8);
 colors = lines(n_cases);
-for k = 1:n_cases
-    b(k).FaceColor = colors(k, :);
-end
+ax = gca;
+ax.ColorOrder = colors;
+ax.NextPlot = 'replacechildren';
+b = bar(net_MWe', 'BarWidth', 0.8);
 set(gca, 'XTickLabel', {scenarios.name}, 'FontSize', 11);
 ylabel('Net Electrical Output (MWe)', 'FontSize', 12, 'FontWeight', 'bold');
 title('Innovation Effectiveness by Scenario', 'FontSize', 13, 'FontWeight', 'bold');
