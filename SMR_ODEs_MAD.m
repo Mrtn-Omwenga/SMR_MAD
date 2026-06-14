@@ -17,11 +17,11 @@ if isempty(error_count)
 end
 
 try
-    dydt = zeros(20,1);
+    dydt = zeros(21,1);
 
     % Validate state vector size
-    if length(y) ~= 20
-        error('State vector y has %d elements, expected 20', length(y));
+    if length(y) ~= 21
+        error('State vector y has %d elements, expected 21', length(y));
     end
 
     % ========== UNPACK STATES ==========

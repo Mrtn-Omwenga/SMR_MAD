@@ -8,7 +8,7 @@ if nargin < 5 || isempty(P_demand_fixed)
     P_demand_fixed = 0.78;
 end
 
-dydt = zeros(20,1);
+dydt = zeros(21,1);
 
 % Unpack states
 P_top = max(min(y(1), 1.25), 0.005);
