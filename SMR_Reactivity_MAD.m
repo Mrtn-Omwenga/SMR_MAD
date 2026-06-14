@@ -1,7 +1,7 @@
 function [rho_ext, rho_xenon, rod_data] = SMR_Reactivity_MAD(t, y, params, scenario)
-% SMR_Reactivity_MAD.m - CRDM + T-avg Program (aligned with base model v11)
+% SMR_Reactivity_MAD.m - CRDM + T-avg Program
 %
-% CRITICAL: Stateless design for ode15s compatibility. No persistent variables.
+% Stateless design for ode15s compatibility. No persistent variables.
 % The MAD-specific innovations are in the cooling system (SMR_ODEs_MAD), not
 % the controller. Using the same controller architecture ensures fair
 % comparison between baseline and MAD.
@@ -28,7 +28,6 @@ if scenario == 3
     try
         P_demand = SMR_Demand(t, params, scenario);
     catch ME
-        fprintf('  [WARN] SMR_Demand error at t=%.3f: %s\n', t, ME.message);
         P_demand = 0.8;
     end
 
@@ -51,7 +50,7 @@ if scenario == 3
     Kp = 0.020;
     rho_p = Kp * power_error;
 
-    % --- STATELESS INTEGRAL ---
+    % --- TIME-WEIGHTED COMPENSATOR ---
     Ki = 0.00002;
     tau_i = 5000;
     rho_i = Ki * power_error * min(t, tau_i);
@@ -64,7 +63,7 @@ if scenario == 3
     rho_max = 0.015;
     rho_demand = max(min(rho_demand, rho_max), -rho_max);
 
-    % --- ALGEBRAIC ROD POSITION (diagnostics only) ---
+    % --- ALGEBRAIC ROD POSITION ---
     if abs(rho_demand) > 1e-10
         rod_z = -sign(rho_demand) * (2/pi) * asin(sqrt(abs(rho_demand) / rho_max));
     else
@@ -82,25 +81,13 @@ if scenario == 3
     rod_data.T_avg = T_c;
     rod_data.T_avg_error = T_avg_error;
 
-    % --- LOGGING (stateless) ---
-    if abs(power_error) > 0.03
-        rho_fb = params.alpha_f * (T_f - params.T_f0_nominal) + ...
-                 params.alpha_c * (T_c - params.T_c0_nominal);
-        fprintf('  [LOG t=%8.1f] P=%.3f, P_dem=%.3f, P_err=%+.3f | ', ...
-                t, P_norm, P_demand, power_error);
-        fprintf('T_c=%6.1f, T_ref=%6.1f, T_err=%+6.1f | ', ...
-                T_c, T_avg_ref, T_avg_error);
-        fprintf('rod_z=%+.3f, rho_ext=%+.5f, rho_fb=%+.5f\n', ...
-                rod_z, rho_ext, rho_fb);
-    end
-
 %% ========================================================================
 % SCENARIOS A & B: STEADY-STATE BASELINE
 %% ========================================================================
 else
-    % Scenario A (temperate baseline) and Scenario B (hot/arid dry cooling)
-    % both operate at steady-state with no external reactivity transient.
-    % Temperature feedback alone maintains power at the nominal level.
+    % Scenario A (temperate baseline): steady-state, no external reactivity.
+    % Scenario B (hot/arid dry cooling): steady-state at reduced power due
+    % to elevated condenser temperature; temperature feedback alone balances.
     rho_ext = 0;
 end
 

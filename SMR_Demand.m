@@ -1,5 +1,4 @@
 function P_demand = SMR_Demand(t, params, scenario)
-% SMR_Demand.m - FIXED with error handling
 % Calculates the power demand setpoint at time t
 
 P_demand = 1.0;  % Default fallback
@@ -21,19 +20,16 @@ try
 
         % Validate arrays before interpolation
         if ~isfield(params, 'load_cycle_points') || ~isfield(params, 'load_cycle_values')
-            fprintf('WARNING: load_cycle arrays missing in params\n');
             P_demand = 0.8;
             return;
         end
 
         if length(params.load_cycle_points) ~= length(params.load_cycle_values)
-            fprintf('WARNING: load_cycle arrays have different lengths\n');
             P_demand = 0.8;
             return;
         end
 
         if length(params.load_cycle_points) < 2
-            fprintf('WARNING: load_cycle arrays too short\n');
             P_demand = 0.8;
             return;
         end
@@ -65,7 +61,6 @@ try
     end
 
 catch ME
-    fprintf('ERROR in SMR_Demand at t=%.3f: %s\n', t, ME.message);
     P_demand = 0.8;  % Safe fallback
 end
 

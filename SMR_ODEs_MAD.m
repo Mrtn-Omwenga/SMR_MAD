@@ -1,13 +1,13 @@
 function dydt = SMR_ODEs_MAD(t, y, params, scenario)
 % SMR_ODEs_MAD.m - OPTIMIZED VERSION v4.1
-% 20-state MAD model with aggressive optimizations
+% 20-state MAD model with conservative parameter set
 %
-% OPTIMIZATIONS in v4.1:
-% 1. PCM storage ENABLED for Scenario C dry cooling
-% 2. Desiccant boost: stage1 0.25, stage2 0.18
+% CONSERVATIVE PARAMETER SET (defensible for commercial deployment):
+% 1. PCM storage: constant boost approximation (not dynamic state tracking)
+% 2. Desiccant boost: stage1 0.12, stage2 0.08 (was 0.25/0.18)
 % 3. NEW: Turbine Inlet Air Cooling (TIAC) innovation
 % 4. Improved enthalpy interpolation with finer pressure steps
-% 5. Higher M-Cycle effectiveness (0.93)
+% 5. M-Cycle effectiveness: 0.80 (was 0.93)
 % 6. Enhanced air flow rates
 % 7. Optimized condenser minimum temperature approach
 
@@ -25,8 +25,8 @@ try
     end
 
     % ========== UNPACK STATES ==========
-    P_top = max(min(y(1), 1.25), 0.005);
-    P_bottom = max(min(y(2), 1.25), 0.005);
+    P_top = y(1);
+    P_bottom = y(2);
     C_top = y(3:8);
     C_bottom = y(9:14);
     I_conc = y(15);
@@ -37,7 +37,7 @@ try
     T_pcm = y(20);
 
     P_total = P_top + P_bottom;
-    P_total = max(min(P_total, 2.4), 0.1);
+    P_total = max(P_total, 0.01);  % Prevent division by zero only
 
     % ========== THERMAL POWER & FLUX ==========
     P_actual_MW = (P_total / 2.0) * params.P_nom;
@@ -292,7 +292,12 @@ try
             else
                 dT_pcm_dt = 0;
             end
-            T_pcm = max(params.pcm_melt_temp - 5, min(params.pcm_melt_temp + 5, T_pcm));
+            % NOTE: PCM state-of-charge tracking is simplified.
+        % params.pcm_melted_fraction is read at initial value and does not
+        % deplete dynamically between ODE calls (MATLAB pass-by-value).
+        % This gives a constant boost approximation suitable for BSc-level
+        % analysis. For dynamic tracking, pcm_melted_fraction should become
+        % a state variable (state #21).
         end
 
         % Condenser feedback for insufficient cooling (milder)
@@ -412,20 +417,18 @@ try
 
 catch ME
     error_count = error_count + 1;
-    if error_count <= 10
-        fprintf('\n*** ERROR in SMR_ODEs_MAD at t=%.6f ***\n', t);
-        fprintf('Message: %s\n', ME.message);
-        fprintf('Identifier: %s\n', ME.identifier);
-        fprintf('Stack trace:\n');
-        for k = 1:length(ME.stack)
-            fprintf('  Line %d in %s\n', ME.stack(k).line, ME.stack(k).name);
-        end
-        fprintf('State vector size: %d\n', length(y));
-        if length(y) >= 2
-            fprintf('P_total = %.4f\n', y(1)+y(2));
-        end
+    fprintf('\n*** ERROR in SMR_ODEs_MAD at t=%.6f ***\n', t);
+    fprintf('Message: %s\n', ME.message);
+    fprintf('Identifier: %s\n', ME.identifier);
+    fprintf('Stack trace:\n');
+    for k = 1:length(ME.stack)
+        fprintf('  Line %d in %s\n', ME.stack(k).line, ME.stack(k).name);
     end
-    dydt = zeros(20,1);
+    fprintf('State vector size: %d\n', length(y));
+    if length(y) >= 2
+        fprintf('P_total = %.4f\n', y(1)+y(2));
+    end
+    rethrow(ME);
 end
 
 end

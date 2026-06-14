@@ -4,7 +4,7 @@
 % hybrid layouts.
 %
 % CRITICAL DESIGN PHILOSOPHY:
-% The model's "effectiveness boosts" (desiccant 0.43, M-Cycle 0.18,
+% The model's "effectiveness boosts" (desiccant 0.20, M-Cycle 0.18,
 % TIAC 0.08) are SYSTEM-LEVEL AGGREGATE parameters. They represent the
 % net improvement of the entire cooling system when innovations are added.
 % The physical implementation is a design choice -- we can achieve the
@@ -27,7 +27,7 @@ function MAD_Specification_Calculator()
 
 fprintf('\n');
 fprintf('=============================================================\n');
-fprintf('MAD COMPONENT SPECIFICATION CALCULATOR (OPTIMIZED v2.0)\n');
+fprintf('MAD COMPONENT SPECIFICATION CALCULATOR\n');
 fprintf('=============================================================\n');
 fprintf('Design philosophy: System-level aggregate parameters mapped to\n');
 fprintf('commercially available components in optimized hybrid layouts.\n\n');
@@ -124,10 +124,10 @@ fprintf('Material:               FRP vessels, SS316 internals (corrosion resista
 fprintf('\n');
 
 %% ========================================================================
-% INNOVATION 2: OPTIMIZED AIR FLOW SYSTEM
+% INNOVATION 2: AIR FLOW SYSTEM
 %% ========================================================================
 fprintf('=============================================================\n');
-fprintf('INNOVATION 2: OPTIMIZED AIR FLOW SYSTEM\n');
+fprintf('INNOVATION 2: AIR FLOW SYSTEM\n');
 fprintf('=============================================================\n');
 
 % Standard ACC layout for 250 MWt: 40 cells (SPX/Marley or similar)
@@ -327,10 +327,10 @@ fprintf('Make-up system:         Evaporative losses + 15%% blowdown\n');
 fprintf('\n');
 
 %% ========================================================================
-% INNOVATION 5: TURBINE INLET AIR COOLING (TIAC) — OPTIMIZED
+% INNOVATION 5: TURBINE INLET AIR COOLING (TIAC)
 %% ========================================================================
 fprintf('=============================================================\n');
-fprintf('INNOVATION 5: TURBINE INLET AIR COOLING (TIAC) — OPTIMIZED\n');
+fprintf('INNOVATION 5: TURBINE INLET AIR COOLING (TIAC)\n');
 fprintf('=============================================================\n');
 
 % MODEL INTERPRETATION:
@@ -377,7 +377,7 @@ parasitic_MW = params.tiac_power_consumption_MW;
 fprintf('Model interpretation:   System-level effectiveness boost = 0.08\n');
 fprintf('Physical meaning:       Absorption chiller cools ACC inlet air slipstream\n');
 fprintf('\n');
-fprintf('--- DERIVED SPECIFICATIONS (OPTIMIZED) ---\n');
+fprintf('--- DERIVED SPECIFICATIONS ---\n');
 fprintf('Chiller type:           Single-effect LiBr-H₂O absorption chiller\n');
 fprintf('Manufacturers:          Thermax, Yazaki, Broad Air (commercial 3–20 MW)\n');
 fprintf('Waste heat source:      Low-pressure turbine exhaust steam (85°C)\n');
@@ -387,7 +387,7 @@ fprintf('Chiller COP:            %.1f (single-effect, LiBr-H₂O)\n', COP_abs);
 fprintf('Cooling capacity:       %.1f MW\n', Q_cooling);
 fprintf('Chiller units:          %d × %.0f MW (N+1 redundancy)\n', n_chiller_units, chiller_capacity_each);
 fprintf('\n');
-fprintf('Cooling coil (optimized):\n');
+fprintf('Cooling coil:\n');
 fprintf('  Cooled airflow:       %.0f%% of ACC inlet (%.0f kg/s)\n', 0.05*100, m_dot_slipstream);
 fprintf('  Temperature drop:     ~8°C on slipstream\n');
 fprintf('  Heat exchanger type:  Plate heat exchanger (brazed SS316)\n');
@@ -407,7 +407,7 @@ fprintf('\n');
 % SUMMARY TABLE
 %% ========================================================================
 fprintf('=============================================================\n');
-fprintf('SUMMARY: MAD COMPONENT SPECIFICATIONS (OPTIMIZED v2.0)\n');
+fprintf('SUMMARY: MAD COMPONENT SPECIFICATIONS\n');
 fprintf('=============================================================\n');
 fprintf('\n');
 fprintf('%-35s %-25s %-25s\n', 'Component', 'Specification', 'Value');
@@ -429,16 +429,10 @@ fprintf('%-35s %-25s %-25s\n', 'TIAC cooling coil', 'Plate HX area', sprintf('%.
 fprintf('%-35s %-25s %-25s\n', 'TIAC parasitic', 'Power', sprintf('%.1f MW', parasitic_MW));
 fprintf('\n');
 fprintf('=============================================================\n');
-fprintf('KEY IMPROVEMENTS vs v1.0:\n');
-fprintf('1. Desiccant: Solid wheels (1,560t, 70.8m) → Liquid (400t, 3.5m vessels)\n');
-fprintf('2. Evaporative: Pure M-Cycle (3,039 modules) → Hybrid CELdek+M-Cycle\n');
-fprintf('3. TIAC coil: Finned tube (27,219 m²) → Plate HX (%.0f m²)\n', A_coil);
-fprintf('4. Added: Cascaded heat use (TIAC waste → desiccant regen)\n');
 fprintf('=============================================================\n');
 fprintf('NOTES:\n');
 fprintf('- All specs are order-of-magnitude estimates for BSc thesis.\n');
 fprintf('- Model parameters are SYSTEM-LEVEL aggregates.\n');
-fprintf('- Physical implementation optimized for cost and footprint.\n');
 fprintf('- Detailed design requires vendor datasheets and CFD.\n');
 fprintf('=============================================================\n');
 

@@ -125,6 +125,9 @@ dT_c_dt = (h_fc_W * max(0, T_f - T_c) - Q_steam_W) / (m_c_safe * c_pc_safe);
 dT_c_dt = max(min(dT_c_dt, 100), -100);
 
 % ========== CONDENSER DYNAMICS ==========
+% Net electric efficiency derates linearly with ambient temperature above
+% 20°C design point. Turbine factor further penalizes high back-pressure
+% (low condenser vacuum) via steam enthalpy drop.
 efficiency_base = params.efficiency_ref - params.efficiency_derate * max(0, params.T_amb - 20);
 efficiency_base = max(0.25, min(0.35, efficiency_base));
 
@@ -226,6 +229,9 @@ dydt(19) = dT_condenser_dt;
 end
 
 % ========== HELPER FUNCTIONS ==========
+% Antoine equation for water saturation pressure.
+% Valid 1–100°C. Returns pressure in bar for condenser temperature
+% range (35–65°C). Used to compute turbine enthalpy drop.
 function P_sat = sat_pressure(T)
     if T <= 100
         log10_P = 8.07131 - 1730.63 / (233.426 + T);
@@ -237,6 +243,9 @@ function P_sat = sat_pressure(T)
     P_sat = max(P_sat, 0.023);
 end
 
+% Linear interpolation of steam enthalpy vs. condenser pressure.
+% Tabulated from steam tables at saturated conditions. The enthalpy
+% drop (h_inlet – h_outlet) drives the turbine power factor.
 function h = steam_enthalpy(P_bar)
     pressure_points = [0.023, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0];
     enthalpy_points = [2000, 2080, 2100, 2200, 2250, 2320, 2450];

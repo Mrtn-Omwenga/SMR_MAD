@@ -1,12 +1,7 @@
 function [rho_ext, rho_xenon, rod_data] = SMR_Reactivity(t, y, params, scenario)
-% v11.0 - Stateless CRDM + T-avg Program for Load-Following
+% Stateless CRDM + T-avg Program for Load-Following
 %
-% CRITICAL FIX v11: Removed ALL persistent variables. MATLAB's ode15s evaluates
-% the derivative function many times per step (Jacobian estimation, Newton
-% iteration for implicit solve). Persistent state corrupts the solver's
-% convergence because f(t,y) is no longer a pure function of (t,y).
-%
-% This version computes reactivity algebraically from the instantaneous state.
+% Computes reactivity algebraically from the instantaneous state.
 % The T-avg program and feedforward terms provide correct steady-state
 % reactivity; proportional + stateless integral handle transients.
 %
@@ -38,7 +33,6 @@ if scenario == 3
     try
         P_demand = SMR_Demand(t, params, scenario);
     catch ME
-        fprintf('  [WARN] SMR_Demand error at t=%.3f: %s\n', t, ME.message);
         P_demand = 0.8;
     end
 
@@ -80,9 +74,9 @@ if scenario == 3
     rho_max = 0.015;
     rho_demand = max(min(rho_demand, rho_max), -rho_max);
 
-    % --- ALGEBRAIC ROD POSITION (diagnostics only) ---
+    % --- ALGEBRAIC ROD POSITION ---
     % Compute the rod position that would produce rho_demand via the
-    % sin-squared worth curve. No persistent state — purely algebraic.
+    % sin-squared worth curve. Purely algebraic — no persistent state.
     if abs(rho_demand) > 1e-10
         rod_z = -sign(rho_demand) * (2/pi) * asin(sqrt(abs(rho_demand) / rho_max));
     else
@@ -99,20 +93,6 @@ if scenario == 3
     rod_data.demand_reactivity = rho_demand;
     rod_data.T_avg = T_c;
     rod_data.T_avg_error = T_avg_error;
-
-    % --- LOGGING (stateless) ---
-    % Print only during significant transients to avoid console spam.
-    % During steady-state (|power_error| < 3%), the controller is silent.
-    if abs(power_error) > 0.03
-        rho_fb = params.alpha_f * (T_f - params.T_f0_nominal) + ...
-                 params.alpha_c * (T_c - params.T_c0_nominal);
-        fprintf('  [LOG t=%8.1f] P=%.3f, P_dem=%.3f, P_err=%+.3f | ', ...
-                t, P_norm, P_demand, power_error);
-        fprintf('T_c=%6.1f, T_ref=%6.1f, T_err=%+6.1f | ', ...
-                T_c, T_avg_ref, T_avg_error);
-        fprintf('rod_z=%+.3f, rho_ext=%+.5f, rho_fb=%+.5f\n', ...
-                rod_z, rho_ext, rho_fb);
-    end
 
 %% ========================================================================
 % SCENARIOS A & B: SIMPLE RAMP PROFILE
